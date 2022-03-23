@@ -120,6 +120,8 @@ public interface AutowireCapableBeanFactory extends BeanFactory {
 	String ORIGINAL_INSTANCE_SUFFIX = ".ORIGINAL";
 
 
+	// Spring 源码特有的分割标识，自己写代码的时候，可以参考一下
+
 	//-------------------------------------------------------------------------
 	// Typical methods for creating and populating external bean instances
 	//-------------------------------------------------------------------------
