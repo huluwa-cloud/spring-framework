@@ -141,6 +141,8 @@ public abstract class PropertiesLoaderUtils {
 	 * @throws IOException if loading failed
 	 */
 	public static void fillProperties(Properties props, Resource resource) throws IOException {
+		// Resource继承了InputStreamSource接口，所以它具有getInputStream()方法，提取读取资源(resource)的流。
+		// 这也意味着Resource接口的具体实现类，是一定会持有一个用以读取Resource的流对象的。
 		try (InputStream is = resource.getInputStream()) {
 			String filename = resource.getFilename();
 			if (filename != null && filename.endsWith(XML_FILE_EXTENSION)) {
@@ -150,6 +152,7 @@ public abstract class PropertiesLoaderUtils {
 				props.loadFromXML(is);
 			}
 			else {
+				// JDK的Properties自带load方法，能将properties文件的流读取，并填充properties对象。
 				props.load(is);
 			}
 		}

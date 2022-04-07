@@ -40,6 +40,8 @@ import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * SpringFactoriesLoader用于Spring的factory加载机制
+ *
  * General purpose factory loading mechanism for internal use within the framework.
  *
  * <p>{@code SpringFactoriesLoader} {@linkplain #loadFactories loads} and instantiates
@@ -59,9 +61,17 @@ import org.springframework.util.StringUtils;
  * @author Sam Brannen
  * @since 3.2
  */
+// 这是一个final类，也即是SpringFactoriesLoader不能被继承
+// 这个SpringFactoriesLoader类，其实直接就可以被外界使用
 public final class SpringFactoriesLoader {
 
 	/**
+	 *
+	 * 这里指明了查找factories的位置。
+	 * 位置是META-INF/spring.factories.
+	 * 这个文件可以是多份，出现在不同的jar包中。
+	 *
+	 * <p>
 	 * The location to look for factories.
 	 * <p>Can be present in multiple JAR files.
 	 */
@@ -70,12 +80,22 @@ public final class SpringFactoriesLoader {
 
 	private static final Log logger = LogFactory.getLog(SpringFactoriesLoader.class);
 
+	// ClassLoader ---> 接口/抽象类 ---> 具体的实现类List
+	// 注意，最外层的Map，key是ClassLoader，
+	// 也就是不同的ClassLoader它的 接口/抽象类 ---> 具体的实现类List 映射Map是隔离的。
+
+	// 为什么要使用包访问权限？？？因为同包下的测试类要直接引用这个变量。
 	static final Map<ClassLoader, Map<String, List<String>>> cache = new ConcurrentReferenceHashMap<>();
 
-
+	// 私有构造器，禁止new SpringFactoriesLoader
 	private SpringFactoriesLoader() {
 	}
 
+	/*
+	 * SpringFactoriesLoader这个类，其实，就只是对外提供2个静态方法，没啥特别的。
+	 * 这个factory加载机制，就是这个静态支撑起来而已。
+	 * 而且，这2个静态方法，逻辑也贼简单。
+	 */
 
 	/**
 	 * Load and instantiate the factory implementations of the given type from
@@ -141,9 +161,17 @@ public final class SpringFactoriesLoader {
 		result = new HashMap<>();
 		try {
 			Enumeration<URL> urls = classLoader.getResources(FACTORIES_RESOURCE_LOCATION);
+			/*
+			 * META-INF/spring.factories文件可以有多个，存在于不同的jar包中。
+			 * 所以提取出来的url有多个，需要做遍历。
+			 */
 			while (urls.hasMoreElements()) {
 				URL url = urls.nextElement();
 				UrlResource resource = new UrlResource(url);
+				/*
+				 * spring.factories虽然文件后缀稀奇古怪，是.factories。
+				 * 但它本质就是一个properties文件，所以需要在这里转换为Properties对象。
+				 */
 				Properties properties = PropertiesLoaderUtils.loadProperties(resource);
 				for (Map.Entry<?, ?> entry : properties.entrySet()) {
 					String factoryTypeName = ((String) entry.getKey()).trim();
@@ -176,6 +204,11 @@ public final class SpringFactoriesLoader {
 				throw new IllegalArgumentException(
 						"Class [" + factoryImplementationName + "] is not assignable to factory type [" + factoryType.getName() + "]");
 			}
+			/*
+			 * !!!!!!!!!!!!!!!!
+			 * 使用反射创建factory具体类的实例
+			 * !!!!!!!!!!!!!!!!
+			 */
 			return (T) ReflectionUtils.accessibleConstructor(factoryImplementationClass).newInstance();
 		}
 		catch (Throwable ex) {
