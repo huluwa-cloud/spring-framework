@@ -64,6 +64,9 @@ public interface ResourceLoader {
 	 * @see Resource#exists()
 	 * @see Resource#getInputStream()
 	 */
+	// 接口定义得真的很多，定义得简单明了
+	// ResourceLoader（资源加载器）的职责就是根据location地址
+	// 获取到Resource（资源）
 	Resource getResource(String location);
 
 	/**

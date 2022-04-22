@@ -52,6 +52,9 @@ public class DefaultResourceLoader implements ResourceLoader {
 
 	private final Set<ProtocolResolver> protocolResolvers = new LinkedHashSet<>(4);
 
+	/**
+	 * resource的缓存
+	 */
 	private final Map<Class<?>, Map<Resource, ?>> resourceCaches = new ConcurrentHashMap<>(4);
 
 
@@ -139,7 +142,9 @@ public class DefaultResourceLoader implements ResourceLoader {
 		this.resourceCaches.clear();
 	}
 
-
+	/**
+	 * ResourceLoader核心接口方法的实现！！！
+	 */
 	@Override
 	public Resource getResource(String location) {
 		Assert.notNull(location, "Location must not be null");
@@ -150,10 +155,11 @@ public class DefaultResourceLoader implements ResourceLoader {
 				return resource;
 			}
 		}
-
+		// 如果location是"/"开头的
 		if (location.startsWith("/")) {
 			return getResourceByPath(location);
 		}
+		// 如果location是"classpath:"开头的
 		else if (location.startsWith(CLASSPATH_URL_PREFIX)) {
 			return new ClassPathResource(location.substring(CLASSPATH_URL_PREFIX.length()), getClassLoader());
 		}
