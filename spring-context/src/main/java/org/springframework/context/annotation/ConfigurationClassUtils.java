@@ -42,6 +42,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
+ *
+ * ConfigurationClassUtil是用来标识Configuration类的工具
+ *
  * Utilities for identifying {@link Configuration} classes.
  *
  * @author Chris Beams
@@ -55,9 +58,11 @@ abstract class ConfigurationClassUtils {
 
 	public static final String CONFIGURATION_CLASS_LITE = "lite";
 
+	// 值就是 org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass
 	public static final String CONFIGURATION_CLASS_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "configurationClass");
 
+	// 值就是 org.springframework.context.annotation.ConfigurationClassPostProcessor.order
 	private static final String ORDER_ATTRIBUTE =
 			Conventions.getQualifiedAttributeName(ConfigurationClassPostProcessor.class, "order");
 
@@ -67,6 +72,14 @@ abstract class ConfigurationClassUtils {
 	private static final Set<String> candidateIndicators = new HashSet<>(8);
 
 	static {
+		/*
+		 *
+		 * 这4中注解都是Configuration类型类的Indicator。
+		 * 也就是用了这4中注解的类，都可以视为Configuration类。
+		 *
+		 * 注意，这里使用了Set数据接口。是的，去重，判定是否存在，使用Set是一个经典方式。
+		 *
+		 */
 		candidateIndicators.add(Component.class.getName());
 		candidateIndicators.add(ComponentScan.class.getName());
 		candidateIndicators.add(Import.class.getName());
@@ -75,6 +88,9 @@ abstract class ConfigurationClassUtils {
 
 
 	/**
+	 *
+	 * 这个方法用来根据BeanDefinition判定这个BeanDefinition是否是一个Configuration类的candidate。
+	 *
 	 * Check whether the given bean definition is a candidate for a configuration class
 	 * (or a nested component class declared within a configuration/component class,
 	 * to be auto-registered as well), and mark it accordingly.
@@ -123,16 +139,27 @@ abstract class ConfigurationClassUtils {
 		}
 
 		Map<String, Object> config = metadata.getAnnotationAttributes(Configuration.class.getName());
+		// config不为null，也就是有@Configuration注解
 		if (config != null && !Boolean.FALSE.equals(config.get("proxyBeanMethods"))) {
+
+			// 将Bean Definition的这个org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass属性
+			// 设置为full
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_FULL);
 		}
+		// 如果没有使用@Configuration来注解，那么有没有使用@Component,@ComponentScan,@Import,@ImportResource注解。
+		// 如果有，那么就是Configuration类型的类
+		// 将Bean Definition的这个org.springframework.context.annotation.ConfigurationClassPostProcessor.configurationClass属性
+		// 设置为 lite。
+		// 因为不是准确的使用@Configuration来做注解的
 		else if (config != null || isConfigurationCandidate(metadata)) {
 			beanDef.setAttribute(CONFIGURATION_CLASS_ATTRIBUTE, CONFIGURATION_CLASS_LITE);
 		}
 		else {
+			// 如果以上都不是，那这个Bean Definition都不是 ConfigurationClassCandidate
 			return false;
 		}
 
+		// 如果这个ConfigurationClassCandidate用了@Order做注解，那么就把这个注解的顺序属性提取出来
 		// It's a full or lite configuration candidate... Let's determine the order value, if any.
 		Integer order = getOrder(metadata);
 		if (order != null) {
@@ -143,6 +170,9 @@ abstract class ConfigurationClassUtils {
 	}
 
 	/**
+	 *
+	 * 判断是否是Configuration类型的类
+	 *
 	 * Check the given metadata for a configuration class candidate
 	 * (or nested component class declared within a configuration/component class).
 	 * @param metadata the metadata of the annotated class
@@ -150,10 +180,12 @@ abstract class ConfigurationClassUtils {
 	 * configuration class processing; {@code false} otherwise
 	 */
 	public static boolean isConfigurationCandidate(AnnotationMetadata metadata) {
+
 		// Do not consider an interface or an annotation...
-		if (metadata.isInterface()) {
+		if (metadata.isInterface()) { //首先不能是接口
 			return false;
 		}
+
 
 		// Any of the typical annotations found?
 		for (String indicator : candidateIndicators) {
@@ -172,6 +204,7 @@ abstract class ConfigurationClassUtils {
 		}
 		catch (Throwable ex) {
 			if (logger.isDebugEnabled()) {
+				// introspect (内观，内省)
 				logger.debug("Failed to introspect @Bean methods on class [" + metadata.getClassName() + "]: " + ex);
 			}
 			return false;
