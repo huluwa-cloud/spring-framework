@@ -26,6 +26,17 @@ import java.util.Set;
 import org.springframework.lang.Nullable;
 
 /**
+ *
+ * CommandLineArgs是命令行参数的抽象。命令行参数是一长串字符串，转化为这个对象。
+ *
+ * CommandLineArgs将命令行参数分为了两大类：
+ * 1) option参数
+ * 2) 非option参数
+ *
+ * option参数用HashMap来存储，非option参数用ArrayList来存储。
+ *
+ * <p>
+ *
  * A simple representation of command line arguments, broken into "option arguments" and
  * "non-option arguments".
  *

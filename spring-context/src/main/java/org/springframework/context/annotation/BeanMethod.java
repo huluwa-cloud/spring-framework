@@ -22,6 +22,9 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.lang.Nullable;
 
 /**
+ *
+ * {@link Bean @Bean}注解的方法的抽象
+ *
  * Represents a {@link Configuration @Configuration} class method annotated with
  * {@link Bean @Bean}.
  *

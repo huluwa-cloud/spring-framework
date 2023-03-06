@@ -58,6 +58,9 @@ package org.springframework.core.env;
 class SimpleCommandLineArgsParser {
 
 	/**
+	 *
+	 * 命令行参数的转换逻辑在这里，其实极其简单。
+	 *
 	 * Parse the given {@code String} array based on the rules described {@linkplain
 	 * SimpleCommandLineArgsParser above}, returning a fully-populated
 	 * {@link CommandLineArgs} object.

@@ -86,6 +86,12 @@ class ConfigurationClassBeanDefinitionReader {
 	 */
 	private static final boolean shouldIgnoreXml = SpringProperties.getFlag("spring.xml.ignore");
 
+	//==================================================================================
+	//==================================================================================
+	//==================================================================================
+	//==================================================================================
+	//==================================================================================
+	//==================================================================================
 	private final BeanDefinitionRegistry registry;
 
 	private final SourceExtractor sourceExtractor;
@@ -152,7 +158,7 @@ class ConfigurationClassBeanDefinitionReader {
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
-
+		// 处理@ImportResource
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
@@ -171,6 +177,12 @@ class ConfigurationClassBeanDefinitionReader {
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(configBeanDef, configBeanName);
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
 		this.registry.registerBeanDefinition(definitionHolder.getBeanName(), definitionHolder.getBeanDefinition());
 		configClass.setBeanName(configBeanName);
 
@@ -201,14 +213,22 @@ class ConfigurationClassBeanDefinitionReader {
 		AnnotationAttributes bean = AnnotationConfigUtils.attributesFor(metadata, Bean.class);
 		Assert.state(bean != null, "No @Bean annotation attributes");
 
+
+		// ===============================  Bean name 处理 begin
 		// Consider name and any aliases
+		/*
+		 * 读取@Bean注解的name属性的值，提取bean name。
+		 * 如果没有定义，那么就使用@Bean注解的方法的方法名methodName作为方法名。
+		 */
 		List<String> names = new ArrayList<>(Arrays.asList(bean.getStringArray("name")));
 		String beanName = (!names.isEmpty() ? names.remove(0) : methodName);
-
 		// Register aliases even when overridden
+		// 剩下的name，作为别名alias
 		for (String alias : names) {
 			this.registry.registerAlias(beanName, alias);
 		}
+		// ===============================  Bean name 处理 end
+
 
 		// Has this effectively been overridden before (e.g. via XML)?
 		if (isOverriddenByExistingDefinition(beanMethod, beanName)) {
@@ -292,6 +312,12 @@ class ConfigurationClassBeanDefinitionReader {
 			logger.trace(String.format("Registering bean definition for @Bean method %s.%s()",
 					configClass.getMetadata().getClassName(), beanName));
 		}
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
+		//==================================================================================
 		this.registry.registerBeanDefinition(beanName, beanDefToRegister);
 	}
 
@@ -387,6 +413,12 @@ class ConfigurationClassBeanDefinitionReader {
 			}
 
 			// TODO SPR-6310: qualify relative path locations as done in AbstractContextLoader.modifyLocations
+			//==================================================================================
+			//==================================================================================
+			//==================================================================================
+			//==================================================================================
+			//==================================================================================
+			//==================================================================================
 			reader.loadBeanDefinitions(resource);
 		});
 	}

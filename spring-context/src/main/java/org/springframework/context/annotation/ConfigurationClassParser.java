@@ -87,7 +87,14 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 
 /**
- * Parses a {@link Configuration} class definition, populating a collection of
+ *
+ * 记住parse是“解析”的意思！
+ *
+ *
+ * Parses a {@link Configuration} class definition,
+ * 这个类的主要作用是解析 Configuration类，提取Definition。
+ *
+ * populating a collection of
  * {@link ConfigurationClass} objects (parsing a single Configuration class may result in
  * any number of ConfigurationClass objects because one Configuration class may import
  * another using the {@link Import} annotation).
@@ -112,8 +119,13 @@ class ConfigurationClassParser {
 
 	private static final PropertySourceFactory DEFAULT_PROPERTY_SOURCE_FACTORY = new DefaultPropertySourceFactory();
 
-	private static final Predicate<String> DEFAULT_EXCLUSION_FILTER = className ->
-			(className.startsWith("java.lang.annotation.") || className.startsWith("org.springframework.stereotype."));
+	private static final Predicate<String> DEFAULT_EXCLUSION_FILTER =
+			className ->
+					(
+							className.startsWith("java.lang.annotation.")
+									||
+							className.startsWith("org.springframework.stereotype.")
+					);
 
 	private static final Comparator<DeferredImportSelectorHolder> DEFERRED_IMPORT_COMPARATOR =
 			(o1, o2) -> AnnotationAwareOrderComparator.INSTANCE.compare(o1.getImportSelector(), o2.getImportSelector());
@@ -244,12 +256,15 @@ class ConfigurationClassParser {
 			}
 		}
 
+		// ====================================================递归处理Configuration类型的类======================
 		// Recursively process the configuration class and its superclass hierarchy.
+		// 递归处理Configuration类型的类
 		SourceClass sourceClass = asSourceClass(configClass, filter);
 		do {
 			sourceClass = doProcessConfigurationClass(configClass, sourceClass, filter);
 		}
 		while (sourceClass != null);
+		// ====================================================递归处理Configuration类型的类=======================
 
 		this.configurationClasses.put(configClass, configClass);
 	}
@@ -267,11 +282,15 @@ class ConfigurationClassParser {
 			ConfigurationClass configClass, SourceClass sourceClass, Predicate<String> filter)
 			throws IOException {
 
+		// ConfigurationClass configClass 这个才是核心，是重点！！！
+
+		//=================================== 处理@Component注解
 		if (configClass.getMetadata().isAnnotated(Component.class.getName())) {
 			// Recursively process any member (nested) classes first
 			processMemberClasses(configClass, sourceClass, filter);
 		}
 
+		//=================================== 处理@PropertySources注解
 		// Process any @PropertySource annotations
 		for (AnnotationAttributes propertySource : AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), PropertySources.class,
@@ -285,6 +304,7 @@ class ConfigurationClassParser {
 			}
 		}
 
+		//=================================== 处理@ComponentScan注解
 		// Process any @ComponentScan annotations
 		Set<AnnotationAttributes> componentScans = AnnotationConfigUtils.attributesForRepeatable(
 				sourceClass.getMetadata(), ComponentScans.class, ComponentScan.class);
@@ -307,9 +327,11 @@ class ConfigurationClassParser {
 			}
 		}
 
+		//=================================== 处理@Import注解
 		// Process any @Import annotations
 		processImports(configClass, sourceClass, getImports(sourceClass), filter, true);
 
+		//=================================== 处理@ImportResource注解
 		// Process any @ImportResource annotations
 		AnnotationAttributes importResource =
 				AnnotationConfigUtils.attributesFor(sourceClass.getMetadata(), ImportResource.class);
@@ -322,6 +344,7 @@ class ConfigurationClassParser {
 			}
 		}
 
+		//=================================== 处理@Bean注解
 		// Process individual @Bean methods
 		Set<MethodMetadata> beanMethods = retrieveBeanMethodMetadata(sourceClass);
 		for (MethodMetadata methodMetadata : beanMethods) {
@@ -400,6 +423,13 @@ class ConfigurationClassParser {
 	 */
 	private Set<MethodMetadata> retrieveBeanMethodMetadata(SourceClass sourceClass) {
 		AnnotationMetadata original = sourceClass.getMetadata();
+		/*
+		 * @Bean注解处理
+		 *
+		 *
+		 *
+		 *
+ 		 */
 		Set<MethodMetadata> beanMethods = original.getAnnotatedMethods(Bean.class.getName());
 		if (beanMethods.size() > 1 && original instanceof StandardAnnotationMetadata) {
 			// Try reading the class file via ASM for deterministic declaration order...
@@ -914,6 +944,9 @@ class ConfigurationClassParser {
 
 
 	/**
+	 *
+	 * SourceClass 是私有的内部类
+	 *
 	 * Simple wrapper that allows annotated source classes to be dealt with
 	 * in a uniform manner, regardless of how they are loaded.
 	 */
@@ -1060,6 +1093,11 @@ class ConfigurationClassParser {
 			return result;
 		}
 
+		/**
+		 * 获取SourceClass注解属性
+		 * annType 注解
+		 * attribute 属性
+		 */
 		public Collection<SourceClass> getAnnotationAttributes(String annType, String attribute) throws IOException {
 			Map<String, Object> annotationAttributes = this.metadata.getAnnotationAttributes(annType, true);
 			if (annotationAttributes == null || !annotationAttributes.containsKey(attribute)) {

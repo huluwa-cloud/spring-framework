@@ -17,6 +17,10 @@
 package org.springframework.beans.factory.parsing;
 
 /**
+ *
+ * Bean Definition分析期间（during bean definition parsing）的 问题报告器
+ *
+ *
  * SPI interface allowing tools and other external processes to handle errors
  * and warnings reported during bean definition parsing.
  *

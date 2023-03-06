@@ -735,6 +735,7 @@ public class PathMatchingResourcePatternResolver implements ResourcePatternResol
 		Set<File> matchingFiles = retrieveMatchingFiles(rootDir, subPattern);
 		Set<Resource> result = new LinkedHashSet<>(matchingFiles.size());
 		for (File file : matchingFiles) {
+			// =====================   在这里把File转为Spring定义的统一的Resource   ======================
 			result.add(new FileSystemResource(file));
 		}
 		return result;

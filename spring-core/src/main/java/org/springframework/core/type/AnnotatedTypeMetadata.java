@@ -29,6 +29,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.util.MultiValueMap;
 
 /**
+ *
+ * 作用：不需要class-loading（类加载）就可以访问 指定的类和方法的 注解
+ *
  * Defines access to the annotations of a specific type ({@link AnnotationMetadata class}
  * or {@link MethodMetadata method}), in a form that does not necessarily require the
  * class-loading.
@@ -74,7 +77,7 @@ public interface AnnotatedTypeMetadata {
 	 * type to look for
 	 * @return a Map of attributes, with the attribute name as key (e.g. "value")
 	 * and the defined attribute value as Map value. This return value will be
-	 * {@code null} if no matching annotation is defined.
+	 * {@code null} if no matching annotation is defined. （如果这个类没有指定的注解，那么就会返回null）
 	 */
 	@Nullable
 	default Map<String, Object> getAnnotationAttributes(String annotationName) {

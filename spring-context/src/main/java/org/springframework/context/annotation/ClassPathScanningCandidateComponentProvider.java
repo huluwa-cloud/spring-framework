@@ -426,6 +426,10 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 					logger.trace("Scanning " + resource);
 				}
 				try {
+					/*
+					 * 其实在这个地方，resource是class文件的File抽象。
+					 * 这里用了ASM来获取class的信息，从而来建立对应的BeanDefinition
+					 */
 					MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
 					if (isCandidateComponent(metadataReader)) {
 						ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);

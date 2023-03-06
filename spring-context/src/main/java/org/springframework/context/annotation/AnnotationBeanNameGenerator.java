@@ -61,6 +61,7 @@ import org.springframework.util.StringUtils;
  * @see javax.inject.Named#value()
  * @see FullyQualifiedAnnotationBeanNameGenerator
  */
+// 平常我们用的，就是这个BeanNameGenerator
 public class AnnotationBeanNameGenerator implements BeanNameGenerator {
 
 	/**

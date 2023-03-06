@@ -44,7 +44,16 @@ import org.springframework.core.metrics.StartupStep;
 import org.springframework.lang.Nullable;
 
 /**
- * Delegate for AbstractApplicationContext's post-processor handling.
+ *
+ * 另外，写一个委托类（Delegate）来执行post-processor的逻辑。
+ * 包括了
+ * 1）BeanFactoryPostProcessor的逻辑
+ * 2）BeanPostProcessor的逻辑
+ * 所以，看也能看到有两个public的静态方法，是分别针对这两种post-processor的。
+ *
+ *
+ * Delegate for AbstractApplicationContext's post-processor(包括BeanFactoryPostProcessor和BeanPostProcessor) handling.
+ *
  *
  * @author Juergen Hoeller
  * @author Sam Brannen
@@ -75,12 +84,17 @@ final class PostProcessorRegistrationDelegate {
 		// Invoke BeanDefinitionRegistryPostProcessors first, if any.
 		Set<String> processedBeans = new HashSet<>();
 
+		// 如果这个spring容器是BeanDefinitionRegistry执行if里面的代码
+		// 其实都不用问，一般spring容器都一定是BeanDefinitionRegistry
 		if (beanFactory instanceof BeanDefinitionRegistry) {
 			BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
+
+				// 这里把BeanDefinitionRegistryPostProcessor单独拎出来，所以就知道它的核心之处
+				//
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =
 							(BeanDefinitionRegistryPostProcessor) postProcessor;
@@ -143,6 +157,8 @@ final class PostProcessorRegistrationDelegate {
 				currentRegistryProcessors.clear();
 			}
 
+			// 在这里统一执行所有类型为BeanDefinitionRegistry的BeanFactoryPostProcessor的统一逻辑
+			// 也就是执行postProcessBeanFactory方法
 			// Now, invoke the postProcessBeanFactory callback of all processors handled so far.
 			invokeBeanFactoryPostProcessors(registryProcessors, beanFactory);
 			invokeBeanFactoryPostProcessors(regularPostProcessors, beanFactory);

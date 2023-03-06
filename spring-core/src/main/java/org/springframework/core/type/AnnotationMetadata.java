@@ -26,6 +26,10 @@ import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
 
 /**
+ *
+ * Spring的这个AnnotationMetadata，其实就是代表了“包含所有一个类的注解信息”的抽象。
+ *
+ *
  * Interface that defines abstract access to the annotations of a specific
  * class, in a form that does not require that class to be loaded yet.
  *
@@ -38,6 +42,7 @@ import org.springframework.core.annotation.MergedAnnotations.SearchStrategy;
  * @see org.springframework.core.type.classreading.MetadataReader#getAnnotationMetadata()
  * @see AnnotatedTypeMetadata
  */
+// 注意接口是可以多继承的
 public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata {
 
 	/**
@@ -123,6 +128,7 @@ public interface AnnotationMetadata extends ClassMetadata, AnnotatedTypeMetadata
 	 * @return a new {@link AnnotationMetadata} instance
 	 * @since 5.2
 	 */
+	// introspect英文是“自省”的意思
 	static AnnotationMetadata introspect(Class<?> type) {
 		return StandardAnnotationMetadata.from(type);
 	}

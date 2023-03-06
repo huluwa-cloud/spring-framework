@@ -19,6 +19,9 @@ package org.springframework.core.type;
 import org.springframework.lang.Nullable;
 
 /**
+ *
+ * spring定义的，用于访问一个指定class的元数据，以一种不需要类加载的形式。
+ *
  * Interface that defines abstract metadata of a specific class,
  * in a form that does not require that class to be loaded yet.
  *

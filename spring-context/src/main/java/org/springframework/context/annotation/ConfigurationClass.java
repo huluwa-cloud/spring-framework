@@ -35,6 +35,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
+ *
+ * 这个类的实例对象，代表一个用户定义的@Congiguration类型的类
+ *
  * Represents a user-defined {@link Configuration @Configuration} class.
  * <p>Includes a set of {@link Bean} methods, including all such methods
  * defined in the ancestry of the class, in a 'flattened-out' manner.
@@ -158,6 +161,9 @@ final class ConfigurationClass {
 	}
 
 	/**
+	 *
+	 * 标识这个Configuration类是不是被其它的Configuration类通过@Import注解，导进来的。
+	 *
 	 * Return whether this configuration class was registered via @{@link Import} or
 	 * automatically registered due to being nested within another configuration class.
 	 * @since 3.1.1

@@ -228,8 +228,26 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		this.applicationStartup = applicationStartup;
 	}
 
+
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//===========================postProcessBeanDefinitionRegistry==============================================
+	//===========================postProcessBeanDefinitionRegistry==============================================
+	//===========================postProcessBeanDefinitionRegistry==============================================
+	//=========================== 入口  入口  入口  入口  入口  入口  入口  入口==============================================
+	//=========================== 入口  入口  入口  入口  入口  入口  入口  入口==============================================
+	//========================== 入口  入口  入口  入口  入口  入口  入口  入口 ===================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
 	/**
-	 * Derive further bean definitions from the configuration classes in the registry.
+	 * Derive（获得） further bean definitions from the configuration classes in the registry.
 	 */
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) {
@@ -247,6 +265,23 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		processConfigBeanDefinitions(registry);
 	}
 
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//===========================postProcessBeanFactory==============================================
+	//===========================postProcessBeanFactory==============================================
+	//===========================postProcessBeanFactory==============================================
+	//=========================== 另一个入口 另一个入口 另一个入口 另一个入口 另一个入口==============================================
+	//=========================== 另一个入口 另一个入口 另一个入口 另一个入口 另一个入口==============================================
+	//=========================== 另一个入口 另一个入口 另一个入口 另一个入口 另一个入口==============================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
+	//=========================================================================
 	/**
 	 * Prepare the Configuration classes for servicing bean requests at runtime
 	 * by replacing them with CGLIB-enhanced subclasses.
@@ -275,8 +310,9 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 	 */
 	public void processConfigBeanDefinitions(BeanDefinitionRegistry registry) {
 		List<BeanDefinitionHolder> configCandidates = new ArrayList<>();
+		// 提取出现在这个Spring容器中已有的所有的BeanDefinition的名字name
 		String[] candidateNames = registry.getBeanDefinitionNames();
-
+		// 然后遍历这些bean name，做逻辑处理
 		for (String beanName : candidateNames) {
 			BeanDefinition beanDef = registry.getBeanDefinition(beanName);
 			if (beanDef.getAttribute(ConfigurationClassUtils.CONFIGURATION_CLASS_ATTRIBUTE) != null) {
@@ -290,6 +326,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Return immediately if no @Configuration classes were found
+		// 如果没有切入点的Configuration类，直接返回，啥也不做
 		if (configCandidates.isEmpty()) {
 			return;
 		}
@@ -306,8 +343,7 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		if (registry instanceof SingletonBeanRegistry) {
 			sbr = (SingletonBeanRegistry) registry;
 			if (!this.localBeanNameGeneratorSet) {
-				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(
-						AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
+				BeanNameGenerator generator = (BeanNameGenerator) sbr.getSingleton(AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR);
 				if (generator != null) {
 					this.componentScanBeanNameGenerator = generator;
 					this.importBeanNameGenerator = generator;
@@ -320,25 +356,48 @@ public class ConfigurationClassPostProcessor implements BeanDefinitionRegistryPo
 		}
 
 		// Parse each @Configuration class
-		ConfigurationClassParser parser = new ConfigurationClassParser(
-				this.metadataReaderFactory, this.problemReporter, this.environment,
-				this.resourceLoader, this.componentScanBeanNameGenerator, registry);
+		// 创建(new)一个Configuration类的解析器
+		ConfigurationClassParser parser = new ConfigurationClassParser
+				(
+						this.metadataReaderFactory,
+						this.problemReporter,
+						this.environment,
+						this.resourceLoader,
+						this.componentScanBeanNameGenerator,
+						registry
+				);
 
 		Set<BeanDefinitionHolder> candidates = new LinkedHashSet<>(configCandidates);
 		Set<ConfigurationClass> alreadyParsed = new HashSet<>(configCandidates.size());
+
+		// parse所有的Configuration candidate
+		// 		candidateIndicators.add(Component.class.getName());
+		//		candidateIndicators.add(ComponentScan.class.getName());
+		//		candidateIndicators.add(Import.class.getName());
+		//		candidateIndicators.add(ImportResource.class.getName());
+		// @Component,@ComponentScan,@Import,@ImportResource注解的类都是Configuration Candidate
 		do {
 			StartupStep processConfig = this.applicationStartup.start("spring.context.config-classes.parse");
+			// 用ConfigurationClassParser来解析 候选Configuration类型的类
 			parser.parse(candidates);
 			parser.validate();
 
 			Set<ConfigurationClass> configClasses = new LinkedHashSet<>(parser.getConfigurationClasses());
+			// 去掉已经parse的Configuration类
 			configClasses.removeAll(alreadyParsed);
 
 			// Read the model and create bean definitions based on its content
 			if (this.reader == null) {
-				this.reader = new ConfigurationClassBeanDefinitionReader(
-						registry, this.sourceExtractor, this.resourceLoader, this.environment,
-						this.importBeanNameGenerator, parser.getImportRegistry());
+				// 创建一个 Bean Definition的阅读器
+				this.reader = new ConfigurationClassBeanDefinitionReader
+						(
+								registry,
+								this.sourceExtractor,
+								this.resourceLoader,
+								this.environment,
+								this.importBeanNameGenerator,
+								parser.getImportRegistry()
+						);
 			}
 			this.reader.loadBeanDefinitions(configClasses);
 			alreadyParsed.addAll(configClasses);

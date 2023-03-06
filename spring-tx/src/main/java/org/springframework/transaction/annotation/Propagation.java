@@ -19,6 +19,10 @@ package org.springframework.transaction.annotation;
 import org.springframework.transaction.TransactionDefinition;
 
 /**
+ *
+ * 代表事务传播行为的枚举，用于和@Transactional注解一起使用，
+ * 而且对应着TransactionDefinition这个接口。
+ *
  * Enumeration that represents transaction propagation behaviors for use
  * with the {@link Transactional} annotation, corresponding to the
  * {@link TransactionDefinition} interface.
@@ -30,14 +34,25 @@ import org.springframework.transaction.TransactionDefinition;
 public enum Propagation {
 
 	/**
+	 *
+	 *
 	 * Support a current transaction, create a new one if none exists.
+	 *
+	 *
+	 *
 	 * Analogous to EJB transaction attribute of the same name.
 	 * <p>This is the default setting of a transaction annotation.
 	 */
 	REQUIRED(TransactionDefinition.PROPAGATION_REQUIRED),
 
 	/**
+	 *
+	 *
+	 *
 	 * Support a current transaction, execute non-transactionally if none exists.
+	 *
+	 *
+	 *
 	 * Analogous to EJB transaction attribute of the same name.
 	 * <p>Note: For transaction managers with transaction synchronization,
 	 * {@code SUPPORTS} is slightly different from no transaction at all,
@@ -50,7 +65,11 @@ public enum Propagation {
 	SUPPORTS(TransactionDefinition.PROPAGATION_SUPPORTS),
 
 	/**
+	 *
 	 * Support a current transaction, throw an exception if none exists.
+	 *
+	 *
+	 *
 	 * Analogous to EJB transaction attribute of the same name.
 	 */
 	MANDATORY(TransactionDefinition.PROPAGATION_MANDATORY),
